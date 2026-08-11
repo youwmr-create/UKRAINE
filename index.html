@@ -58,17 +58,23 @@ document.getElementById('clanForm').addEventListener('submit', function(event) {
     const screenshot = document.getElementById('screenshot').value;
     const about = document.getElementById('about').value;
 
-    const text = "⚔️ Нова заявка в клан UKRAINE GTA! \n\n👤 Нікнейм: " + nickname + "\n📸 Статистика: " + screenshot + "\n\n💬 Коментар:\n" + about;
+    // Новий безпечний формат тексту без символів \n, які ламали запит
+    const text = "⚔️ Нова заявка в клан UKRAINE GTA! ⚔️ | Нікнейм: " + nickname + " | Статистика: " + screenshot + " | Коментар: " + about;
 
     button.disabled = true;
     button.innerText = "Надсилання...";
     statusBox.style.display = "none";
 
-    // На GitHub Pages цей фоновий запит пройде миттєво
-    fetch("https://telegram.org" + botToken + "/sendMessage", {
+    const url = "https://telegram.org" + botToken + "/sendMessage";
+    
+    // Відправляємо дані як чистий JSON — це найнадійніший спосіб для API Telegram
+    fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "chat_id=" + encodeURIComponent(chatId) + "&text=" + encodeURIComponent(text)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: text
+        })
     })
     .then(response => {
         if (response.ok) {
