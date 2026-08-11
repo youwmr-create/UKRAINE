@@ -46,11 +46,12 @@
 
 <script>
 document.getElementById('clanForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Зупиняємо перезавантаження сторінки
+
     const button = document.getElementById('submitBtn');
     const statusBox = document.getElementById('statusBox');
     
-    // Твої точні перевірені ключі
+    // Твої точні перевірені ключі з відео
     const botToken = "8521308038:AAEzH5M09JGQdgsSomo9pbqtiDLenyjKy2s"; 
     const chatId = "1681643282"; 
 
@@ -58,26 +59,20 @@ document.getElementById('clanForm').addEventListener('submit', function(event) {
     const screenshot = document.getElementById('screenshot').value;
     const about = document.getElementById('about').value;
 
-    // Новий безпечний формат тексту без символів \n, які ламали запит
-    const text = "⚔️ Нова заявка в клан UKRAINE GTA! ⚔️ | Нікнейм: " + nickname + " | Статистика: " + screenshot + " | Коментар: " + about;
+    // Складаємо красивий та безпечний текст для боту
+    const text = "⚔️ Нова заявка в клан UKRAINE GTA! ⚔️\n\n👤 Нікнейм: " + nickname + "\n📸 Статистика: " + screenshot + "\n\n💬 Коментар:\n" + about;
 
     button.disabled = true;
     button.innerText = "Надсилання...";
     statusBox.style.display = "none";
 
-    const url = "https://telegram.org" + botToken + "/sendMessage";
-    
-    // Відправляємо дані як чистий JSON — це найнадійніший спосіб для API Telegram
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: chatId,
-            text: text
-        })
-    })
+    // Створюємо фоновий GET-запит (імітуємо перехід за прямим посиланням у браузері)
+    const url = "https://telegram.org" + botToken + "/sendMessage?chat_id=" + chatId + "&text=" + encodeURIComponent(text);
+
+    fetch(url, { method: "GET" })
     .then(response => {
         if (response.ok) {
+            // Зелений напис, якщо Telegram успішно прийняв лінк
             statusBox.className = "status-message status-success";
             statusBox.innerText = "Успішно! Анкета вже в Телеграмі у лідерів.";
             statusBox.style.display = "block";
@@ -87,8 +82,9 @@ document.getElementById('clanForm').addEventListener('submit', function(event) {
         }
     })
     .catch(() => {
+        // Якщо сталася помилка
         statusBox.className = "status-message status-error";
-        statusBox.innerText = "Помилка відправки сервером Telegram.";
+        statusBox.innerText = "Помилка з'єднання з сервером Telegram.";
         statusBox.style.display = "block";
     })
     .finally(() => {
