@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подача заявки в клан | UKRAINE GTA</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b0c10; color: #c5c6c7; padding: 20px; }
+        .form-container { background-color: #1f2833; padding: 30px; border-radius: 8px; max-width: 500px; margin: 50px auto; border: 1px solid #2481cc; }
+        h2 { text-align: center; color: #fff; margin-bottom: 20px; text-transform: uppercase; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #45f3ff; font-size: 14px; }
+        input, textarea { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45f3ff; border-radius: 4px; color: #fff; font-size: 16px; }
+        input:focus, textarea:focus { border-color: #2481cc; outline: none; }
+        .hint { font-size: 12px; color: #888; margin-top: 4px; }
+        button { width: 100%; padding: 14px; background-color: #2481cc; color: #0b0c10; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        button:hover { box-shadow: 0 0 15px #45f3ff; color: #fff; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+        .status-message { margin-top: 15px; padding: 10px; border-radius: 4px; font-size: 14px; text-align: center; display: none; }
+        .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Подати заявку</h2>
+    <form id="clanForm">
+        <div class="form-group">
+            <label for="nickname">Ваш нікнейм (Nick_Name)</label>
+            <input type="text" id="nickname" required placeholder="Приклад: Степан_Бандера">
+        </div>
+        <div class="form-group">
+            <label for="screenshot">Посилання на скриншот статистики</label>
+            <input type="text" id="screenshot" required placeholder="https://imgur.com...">
+        </div>
+        <div class="form-group">
+            <label for="about">Чому хочете до нас?</label>
+            <textarea id="about" required placeholder="Опишіть ваші цілі в клані..."></textarea>
+        </div>
+        <button type="submit" id="submitBtn">Надіслати анкету</button>
+        <div id="statusBox" class="status-message"></div>
+    </form>
+</div>
+
+<script>
+document.getElementById('clanForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const button = document.getElementById('submitBtn');
+    const statusBox = document.getElementById('statusBox');
+    
+    // Твої точні перевірені ключі
+    const botToken = "8521308038:AAEzH5M09JGQdgsSomo9pbqtiDLenyjKy2s"; 
+    const chatId = "1681643282"; 
+
+    const nickname = document.getElementById('nickname').value;
+    const screenshot = document.getElementById('screenshot').value;
+    const about = document.getElementById('about').value;
+
+    const text = "⚔️ Нова заявка в клан UKRAINE GTA! \n\n👤 Нікнейм: " + nickname + "\n📸 Статистика: " + screenshot + "\n\n💬 Коментар:\n" + about;
+
+    button.disabled = true;
+    button.innerText = "Надсилання...";
+    statusBox.style.display = "none";
+
+    // На GitHub Pages цей фоновий запит пройде миттєво
+    fetch("https://telegram.org" + botToken + "/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "chat_id=" + encodeURIComponent(chatId) + "&text=" + encodeURIComponent(text)
+    })
+    .then(response => {
+        if (response.ok) {
+            statusBox.className = "status-message status-success";
+            statusBox.innerText = "Успішно! Анкета вже в Телеграмі у лідерів.";
+            statusBox.style.display = "block";
+            document.getElementById('clanForm').reset();
+        } else {
+            throw new Error();
+        }
+    })
+    .catch(() => {
+        statusBox.className = "status-message status-error";
+        statusBox.innerText = "Помилка відправки сервером Telegram.";
+        statusBox.style.display = "block";
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerText = "Надіслати анкету";
+    });
+});
+</script>
+</body>
+</html>
